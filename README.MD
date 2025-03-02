@@ -1,10 +1,18 @@
+# Looking to Develop on this Fork
+- Looking to add support for JSON configuration file rather than hardcoded paths.
+- Perhaps use one BaseWindow not multiple BrowserWindow copies
+- Testing with [IINACT](https://github.com/marzent/IINACT) 
+- Testing with [XFCE4's built-in compositor](https://wiki.archlinux.org/title/Xfwm#Composite_manager) 
+
 # Linux ACT Electron Overlay
 
-Rough implementation to allow various ACT Overlays to display over FFXIV. Functionality has only been tested on Arch on X11 on GNOME's Mutter compositor.
+Rough implementation to allow various ACT Overlays to display over FFXIV. Functionality has only been tested on [ArchLinux](https://archlinux.org/) on X11 with GNOME's Mutter compositor.
 
 ## Prerequisites
 - [Node.js](https://nodejs.org/)
-- [Electron](https://electronjs.org/) 
+- [Electron](https://electronjs.org/), any version after 29.1.0
+- [NPM](https://www.npmjs.com/)
+However your particular machine gets these is up to you. (e.g. for Arch: 'pacman -S nodejs electron34 npm')
 
 ## Installation
 - Clone the repository
