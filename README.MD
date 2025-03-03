@@ -1,6 +1,6 @@
 # Looking to Develop on this Fork
 - DONE! Looking to add support for JSON configuration file rather than hardcoded paths.
-    - The JSON file is passed via command line, i.e. 'npm start -- ./config.json'
+    - The JSON file is passed via command line, i.e. `npm start -- ./config.json`
     - config.json included as an example, with explanations for the fields included as comments.
 - TODO? Perhaps use one BaseWindow not multiple BrowserWindow copies?
 - Testing with [IINACT](https://github.com/marzent/IINACT) 
@@ -15,13 +15,13 @@ Rough implementation to allow various ACT Overlays to display over FFXIV. Functi
 - [Electron](https://electronjs.org/), any version after 29.1.0
 - [NPM](https://www.npmjs.com/)
 
-However your particular machine gets these is up to you. (e.g. for Arch: 'pacman -S nodejs electron34 npm').
+However your particular machine gets these is up to you. (e.g. for Arch: `pacman -S nodejs electron34 npm`).
 
 ## Installation
 - Clone the repository
 - Navigate to project directory 
-- Run 'npm install' to install Electron
-- Start the application with 'npm start'.
+- Run `npm install` to install Electron
+- Start the application with `npm start`.
 
 ## Usage
 Requires ACT installed per [valarnin's repository.](https://github.com/valarnin/ffxiv-tools), with OverlayPlugin WSServer started. 
