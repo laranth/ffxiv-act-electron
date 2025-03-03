@@ -1,6 +1,8 @@
 # Looking to Develop on this Fork
-- Looking to add support for JSON configuration file rather than hardcoded paths.
-- Perhaps use one BaseWindow not multiple BrowserWindow copies
+- DONE! Looking to add support for JSON configuration file rather than hardcoded paths.
+    - The JSON file is passed via command line, i.e. 'npm start -- ./config.json'
+    - config.json included as an example, with explanations for the fields included as comments.
+- TODO? Perhaps use one BaseWindow not multiple BrowserWindow copies?
 - Testing with [IINACT](https://github.com/marzent/IINACT) 
 - Testing with [XFCE4's built-in compositor](https://wiki.archlinux.org/title/Xfwm#Composite_manager) 
 
