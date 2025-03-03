@@ -1,8 +1,12 @@
-# Looking to Develop on this Fork
-- DONE! Looking to add support for JSON configuration file rather than hardcoded paths.
+# Changes on this Fork
+- DONE! Add support for JSON configuration file rather than hardcoded paths.
     - The JSON file is passed via command line, i.e. `npm start -- ./config.json`
+    - Multiple windows configurable, keybind for the global shortcut is configurable.
+    - Each window can be individually sized, positioned, and zoomed
+    - Bonus, can mark any overlay to start as 'hidden' and only be visible if you toggle the "global shortcut"
     - config.json included as an example, with explanations for the fields included as comments.
 - TODO? Perhaps use one BaseWindow not multiple BrowserWindow copies?
+- TODO? Security review? Performance review?
 - Testing with [IINACT](https://github.com/marzent/IINACT) 
 - Testing with [XFCE4's built-in compositor](https://wiki.archlinux.org/title/Xfwm#Composite_manager) 
 
