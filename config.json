@@ -1,0 +1,25 @@
+{
+    "COMMENT_ON_KEYBIND" : "Keybinding used to make the overlays focusable (aka interact with the mouse). Electron doesn't seem to have fully documented the behavior, but some examples are on https://www.electronjs.org/docs/latest/tutorial/keyboard-shortcuts. An empty string or non-existent entry will disable the feature.",
+    "keyBind":"CommandOrControl+Shift+D",
+    "COMMENT_ON_VIEWS" : "Views is an array of the various overlay windows you want to set up. Each view has a name, an URL, a width/height and x/y position, a zoom level (optional, defaults to 1.0 maps to 100%), and a 'debug' flag that hides the window until it we make the overlay focusable (optional, defaults to false). Any view with name exactly 'TEMPLATE' will be ignored by the tool",
+    "views" : [
+        {"name"   : "TEMPLATE",
+         "url"    : "https://www.electronjs.org",
+         "width"  : 800,
+         "height" : 600,
+         "x"      : 1080,
+         "y"      : 400,
+         "zoom"   : 1.0,
+         "debug"  : false
+        },
+        {"name"   : "example, starts hidden until you use the keybind",
+         "url"    : "example.html",
+         "width"  : 500,
+         "height" : 400,
+         "x"      : 1100,
+         "y"      : 1400,
+         "zoom"   : 1.5,
+         "debug"  : true
+        }
+ ]
+}
