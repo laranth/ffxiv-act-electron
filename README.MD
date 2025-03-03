@@ -14,7 +14,8 @@ Rough implementation to allow various ACT Overlays to display over FFXIV. Functi
 - [Node.js](https://nodejs.org/)
 - [Electron](https://electronjs.org/), any version after 29.1.0
 - [NPM](https://www.npmjs.com/)
-However your particular machine gets these is up to you. (e.g. for Arch: 'pacman -S nodejs electron34 npm')
+
+However your particular machine gets these is up to you. (e.g. for Arch: 'pacman -S nodejs electron34 npm').
 
 ## Installation
 - Clone the repository
