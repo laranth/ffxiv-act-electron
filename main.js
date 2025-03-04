@@ -216,23 +216,25 @@ function createOverlaysJSON() {
             height         : myViewConfigs[i].height,
             x              : myViewConfigs[i].x,
             y              : myViewConfigs[i].y,
-            zoomFactor     : myViewConfigs[i].zoom,
             show           : !myViewConfigs[i].debug,
             frame          : false,
             focusable      : false,
             transparent    : true,
             alwaysOnTop    : true,
             webPreferences : {
-                nodeIntegration: true,
-                contextIsolation: false,
-                enableRemoteModule: true,
-                additionalArguments: ['--enable-transparent-visuals', '--disable-gpu']
+                zoomFactor          : myViewConfigs[i].zoom,
+                nodeIntegration     : true,
+                contextIsolation    : false,
+                enableRemoteModule  : true,
+                additionalArguments : ['--enable-transparent-visuals', '--disable-gpu']
             }
         });
         myViews[i].loadURL(myViewConfigs[i].url);
         myViews[i].setIgnoreMouseEvents(!myAllowInteraction, {forward:true});
     }
 }
+
+//app.disableHardwareAcceleration();
 
 app.whenReady().then(() => {
 
