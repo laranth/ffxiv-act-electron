@@ -5,7 +5,7 @@
     - Each window can be individually sized, positioned, and zoomed
     - Bonus, can mark any overlay to start as 'hidden' and only be visible if you toggle the "global shortcut"
     - config.json included as an example, with explanations for the fields included as comments.
-- TODO? Perhaps use one BaseWindow not multiple BrowserWindow copies?
+- Upgrade to electron version 34
 - TODO? Security review? Performance review?
 - Testing with [IINACT](https://github.com/marzent/IINACT) 
 - Testing with [XFCE4's built-in compositor](https://wiki.archlinux.org/title/Xfwm#Composite_manager) 
@@ -16,10 +16,10 @@ Rough implementation to allow various ACT Overlays to display over FFXIV. Functi
 
 ## Prerequisites
 - [Node.js](https://nodejs.org/)
-- [Electron](https://electronjs.org/), any version after 29.1.0
+- [Electron](https://electronjs.org/)
 - [NPM](https://www.npmjs.com/)
 
-However your particular machine gets these is up to you. (e.g. for Arch: `pacman -S nodejs electron34 npm`).
+I don't quite understand this whole NPM thing... but note to self: `pacman -S nodejs electron34 npm`.
 
 ## Installation
 - Clone the repository

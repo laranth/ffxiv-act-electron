@@ -1,76 +1,62 @@
-// Run me with: npm start -- ./config.json 
+// Run me with: npm start -- ./config.json
 
+const {BrowserWindow, globalShortcut} = require('electron'); // declare a few things from electron
 
-const { app, BaseWindow, WebContentsView, BrowserWindow, globalShortcut, screen, View } = require('electron'); // declare a few things from electron
-const fs = require('node:fs');
-
-// NEW WAY
-var myConfig; // configuration struct from JSON
-var myViewConfigs = []; // parsed and sanitized
-var myViews = [];
-var myAllowInteraction = false; // interaction disabled by default
-
-// UnderDevelopment: using one BaseWindow and mulitple WebContentView's as children of it
-var myBaseWindow;
-const newWayViaBaseWindow = false; // TODO: under development
+let myConfig; // configuration struct from JSON
+let myViewConfigs = []; // parsed and sanitized
+let myViews       = []; // list of BrowserWindows we've launched
+let myAllowInteraction = false; // interaction disabled by default
 
 function inhaleJSONConfig() {
     if (process.argv.length > 2) {
         try {
             console.log('INFO: Parsing configuration file:', process.argv[2], '...');
+            let fs = require('node:fs');
             myConfig = JSON.parse(fs.readFileSync(process.argv[2]));
         }
         catch (e) {
             console.log('ERROR: problem reading the JSON file passed on the command line...');
-            console.log(e);
+            console.dir(e);
             process.exit(1);
         }
-
     } else {
         console.log("ERROR: No JSON config file passed in on command line... exiting.");
         process.exit(1);
     }
 }
 
-function bindKeys() {
+function flipDebug() {
+    for (let i = 0; i <  myViewConfigs.length; i++) {
+        if (myViewConfigs[i].debug) {
+            if (myAllowInteraction) {
+                myViews[i].hide();
+            } else {
+                myViews[i].show();
+            }
+        }
+    }
+    myAllowInteraction = !myAllowInteraction;
+    for (let i = 0; i < myViews.length; i++) {
+        myViews[i].setIgnoreMouseEvents(!myAllowInteraction, {forward:true});
+    }
+}
 
+// TODO: split this into 2 keybinds: 1 to disable clickthru
+//       and one to add a background color so you can see where these invisible overlays really are (and maybe even move them around!)
+function bindKeys() {
     if ('keyBind' in myConfig &&
         myConfig.keyBind != null &&
         !myConfig.keyBind.trim().isEmpty) {
         // TODO here more input sanity checks
         let myKeyBinding = myConfig.keyBind.trim();
 
-        const returnValue = globalShortcut.register(myKeyBinding, () => {
-            for (let i = 0; i <  myViewConfigs.length; i++) {
-                if (myViewConfigs[i].debug) {
-                    //console.log("DEBUG: view[",i,"] is a debug one");
-                    if (myAllowInteraction) {
-                        myViews[i].hide();
-                    } else {
-                        myViews[i].show();
-                    }
-                }
-            }
-            //console.log("DEBUG: keybind press detected! is Interaction Allowed?",myAllowInteraction, "->", !myAllowInteraction);
-            myAllowInteraction = !myAllowInteraction;
-            if (newWayViaBaseWindow) { // TODO: UNDER DEVELOPMENT
-                myBaseWindow.setFocusable(myAllowInteraction);
-                myBaseWindow.setIgnoreMouseEvents(!myAllowInteraction, { forward: true });
-            } else {
-                for (let i = 0; i < myViews.length; i++) {
-                    myViews[i].setIgnoreMouseEvents(!myAllowInteraction, {forward:true});
-                }
-            }
-        });
-
-        if (!returnValue) {
+        if (!globalShortcut.register(myKeyBinding, () => {flipDebug();})) {
             console.log('ERROR: Keybinding registration failed, exiting...');
             process.exit(1);
         }
-        console.log("INFO: Checking is the keybind registered: ", globalShortcut.isRegistered(myKeyBinding));
+        console.log("INFO: Keybind",myConfig.keyBind," successfully registered!");
 
     } else { console.log("WARNING: No keybind configured, will not map any...");}
-
 }
 
 function parseViews() { // TODO here more input sanity checks
@@ -95,18 +81,16 @@ function parseViews() { // TODO here more input sanity checks
                     if ('debug' in myConfig.views[i]) {
                         debug = myConfig.views[i].debug;
                     }
-
                     if (myConfig.views[i].url.match(/https?:\/\//) == null) {
                         url = require('url').format({
                             protocol: 'file',
                             slashes: true,
                             pathname: require('node:path').join(__dirname, url)
                         });
-                        console.log("INFO: is file",url);
                     }
                     myViewConfigs.push({
                         'name'  : myConfig.views[i].name,
-                        'url'   : url, //myConfig.views[i].url,
+                        'url'   : url,
                         'width' : myConfig.views[i].width,
                         'height': myConfig.views[i].height,
                         'x'     : myConfig.views[i].x,
@@ -126,91 +110,10 @@ function parseViews() { // TODO here more input sanity checks
     }
 }
 
-function createBaseWindow() {
-
-    var myDisplay = screen.getPrimaryDisplay();
-    var myRect    = myDisplay.bounds;
-
-    //console.log('INFO: Setting up Base Window with ',myRect);
-
-    // setup your base window to be the size of the primary display
-    myBaseWindow = new BaseWindow({
-        x             : myRect.x,
-        y             : myRect.y,
-        width         : myRect.width,
-        height        : myRect.height,
-        frame         : false,
-        focusable     : false,
-        transparent   : true,
-        alwaysOnTop   : true,
-        title         : "ffxiv iinact overlay",
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            enableRemoteModule: true,
-            additionalArguments: ['--enable-transparent-visuals', '--disable-gpu']
-        }
-    });
-    // start with a non-interactable window
-    myBaseWindow.setIgnoreMouseEvents(!myAllowInteraction, {forward:true});
-    myBaseWindow.show();
-
-    // Make sure things close cleanly
-    myBaseWindow.on('closed', () => {
-        console.log("INFO: closing views...");
-        var myKids = myBaseWindow.getChildWindows();
-        for (let i = 0; i < myKids.length; i++) {
-            myKids[i].webContents.close();
-        };
-    });
-    //console.log(myBaseWindow);
-}
-
-function createViews() {  // TODO: UNDER DEVELOPMENT
+function createViews() {
     console.log('INFO: Setting up',myViewConfigs.length,'Views ...');
 
     for (let i = 0; i < myViewConfigs.length; i++) {
-        console.log('INFO: Setting up view[',i,'] with',myViewConfigs[i]);
-        try {
-            const mine = new WebContentsView({
-                webContents: {
-                    zoomFactor: myViewConfigs[i].zoom,
-                },
-                webPreferences: {
-                    transparent: true,
-                    nodeIntegration: true,
-                    contextIsolation: false,
-                    enableRemoteModule: true,
-                    additionalArguments: ['--enable-transparent-visuals', '--disable-gpu']
-                }
-            });
-            myViews.push(mine);
-            mine.webContents.loadURL(myViewConfigs[i].url);
-            myBaseWindow.contentView.addChildView(mine);
-            mine.setBackgroundColor('red');
-            mine.setBounds({
-                x: myViewConfigs[i].x,
-                y: myViewConfigs[i].y,
-                width: myViewConfigs[i].width,
-                height: myViewConfigs[i].height
-            });
-            //myViews[i].webContents.setZoomFactor(myViewConfigs[i].zoom);
-            //myViews[i].setVisible(true/*!myViewConfigs[i].debug*/);
-        } catch (e) {
-            console.log("ERROR: while creating view[",i,"]");
-            //console.log(myViews[i]);
-            console.log(e);
-            process.exit(1);
-        }
-    }
-    console.log("INFO: Done setting up Views!");
-}
-
-function createOverlaysJSON() {
-    console.log('INFO: Setting up',myViewConfigs.length,'Views via BrowserWindows ...');
-
-    for (let i = 0; i < myViewConfigs.length; i++) {
-        //console.log('INFO: Setting up view[',i,'] with',myViewConfigs[i]);
         myViews[i] = new BrowserWindow({
             width          : myViewConfigs[i].width,
             height         : myViewConfigs[i].height,
@@ -222,35 +125,33 @@ function createOverlaysJSON() {
             transparent    : true,
             alwaysOnTop    : true,
             webPreferences : {
-                zoomFactor          : myViewConfigs[i].zoom,
-                nodeIntegration     : true,
-                contextIsolation    : false,
-                enableRemoteModule  : true,
-                additionalArguments : ['--enable-transparent-visuals', '--disable-gpu']
+                zoomFactor                 : myViewConfigs[i].zoom,
+                nodeIntegration            : true,
+                contextIsolation           : false,
+                enableRemoteModule         : true,
             }
         });
+        //TODO:idea? put a name on that window instead of rendering contents+background??? myViews[i].setBackgroundColor('blueviolet');
         myViews[i].loadURL(myViewConfigs[i].url);
         myViews[i].setIgnoreMouseEvents(!myAllowInteraction, {forward:true});
     }
 }
 
-//app.disableHardwareAcceleration();
-
-app.whenReady().then(() => {
-
+function main() {
     inhaleJSONConfig();
     bindKeys();
     parseViews();
-
-    if (newWayViaBaseWindow) { // TODO: UNDER DEVELOPMENT
-        createBaseWindow();
-        createViews();
-    } else {
-        createOverlaysJSON();
-    }
-
+    createViews();
     console.log("INFO: Overlays loaded!");
-});
+}
+
+const { app } = require('electron');
+
+//console.dir(app.getGPUInfo('complete'))
+//console.dir(app.getGPUFeatureStatus())
+app.disableHardwareAcceleration(); // we're using software compositing, so might as well skip spawning a mostly-useless GPU raster job
+
+app.whenReady().then(() => {main();});
 
 app.on('will-quit', () => {
     // Unregister all shortcuts.
